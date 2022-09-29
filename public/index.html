@@ -1,8 +1,39 @@
 <html>
-    <head>
-        <title>sample</title>
-    </head>
-    <body>
-        <h1>sample</h1>
-    </body>
+<head>
+    <meta charset='UTF-8'>
+    <title>Server-sent events demo</title>
+</head>
+<body>
+    <button>Close the connection</button>
+    <ul>
+    </ul>
+
+<script>
+    console.log(new Date()); //(1)
+
+    var button = document.querySelector('button');
+    var evtSource = new EventSource('sse.php');
+    var eventList = document.querySelector('ul');
+
+    evtSource.onopen = function() {
+        console.log('Connection to server opened.');
+    };
+
+    evtSource.onmessage = function(e) {
+        console.log(new Date()); //(2)
+        var newElement = document.createElement('li');
+        newElement.textContent = 'message: ' + e.data;
+        eventList.appendChild(newElement);
+    };
+
+    evtSource.onerror = function() {
+        console.log('EventSource failed.');
+    };
+
+    button.onclick = function() {
+        console.log('Connection closed');
+        evtSource.close();
+    };
+</script>
+</body>
 </html>
