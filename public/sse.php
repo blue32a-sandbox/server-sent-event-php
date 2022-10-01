@@ -8,8 +8,11 @@ header('Cache-Control: no-store');
 header('Content-Type: text/event-stream');
 
 $id = 0;
+$count = 0;
 
-while (true) {
+while ($count < 10) {
+    $count++;
+
     $curDate = date(DATE_ISO8601);
     debug($curDate);
 
