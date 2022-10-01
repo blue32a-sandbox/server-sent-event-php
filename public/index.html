@@ -4,36 +4,48 @@
     <title>Server-sent events demo</title>
 </head>
 <body>
-    <button>Close the connection</button>
-    <ul>
+    <button id="close-btn">Close the connection</button>
+    <ul id="event-list">
     </ul>
 
 <script>
-    console.log(new Date()); //(1)
+(function () {
+    const evtSource = new EventSource('sse.php');
+    const eventList = document.getElementById('event-list');
 
-    var button = document.querySelector('button');
-    var evtSource = new EventSource('sse.php');
-    var eventList = document.querySelector('ul');
+    function createRowElement() {
+        return document.createElement('li');
+    }
 
     evtSource.onopen = function() {
         console.log('Connection to server opened.');
-    };
-
-    evtSource.onmessage = function(e) {
-        console.log(new Date()); //(2)
-        var newElement = document.createElement('li');
-        newElement.textContent = 'message: ' + e.data;
-        eventList.appendChild(newElement);
     };
 
     evtSource.onerror = function() {
         console.log('EventSource failed.');
     };
 
-    button.onclick = function() {
+    evtSource.onmessage = function(e) {
+        console.log('receive message: ' + new Date());
+        const rowEl = createRowElement();
+        rowEl.textContent = 'message: ' + e.data;
+        eventList.appendChild(rowEl);
+    };
+
+    evtSource.addEventListener('ping', function(e) {
+        console.log('receive ping: ' + new Date());
+        const rowEl = createRowElement();
+        const data = JSON.parse(event.data);
+        rowEl.textContent = 'ping: ' + data.text + ' ' + data.time;
+        eventList.appendChild(rowEl);
+    });
+
+    const closeBtn = document.getElementById('close-btn');
+    closeBtn.addEventListener('click', function() {
         console.log('Connection closed');
         evtSource.close();
-    };
+    });
+})();
 </script>
 </body>
 </html>
